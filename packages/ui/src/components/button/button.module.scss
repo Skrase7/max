@@ -1,0 +1,12 @@
+.button {
+  background: #333;
+  color: #fff;
+
+  &.isSecondary {
+    background: #000;
+  }
+}
+
+.buttonText {
+  color: var(--test-color);
+}
