@@ -1,0 +1,168 @@
+// Все значения переопределяются CSS-переменными --select-*, SCSS править не нужно.
+//
+// Где задавать переменные:
+// - для поля, подписи и ошибки: на любом родителе или через className /
+//   triggerClassName;
+// - для выпадающего списка и пунктов (--select-popup-bg, --select-item-*,
+//   --select-shadow, --select-z-index и т.д.): на :root / body или через
+//   popupClassName / itemClassName. Список выводится порталом в body, поэтому
+//   переменные с обычного родителя до него не доходят.
+//
+// Дизайн-токены пока не подключены, поэтому запасные значения заданы здесь.
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.label {
+  font-size: var(--select-label-size, 14px);
+  font-weight: var(--select-label-weight, 600);
+  color: var(--select-label-color, #1d1c1d);
+  cursor: default;
+}
+
+.trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  box-sizing: border-box;
+  width: var(--select-trigger-width, 100%);
+  min-height: var(--select-trigger-height, 44px);
+  padding: var(--select-trigger-padding, 0 12px);
+  // Граница поля: контраст ≥ 3:1 с фоном (WCAG 1.4.11).
+  border: 1px solid var(--select-trigger-border-color, #8c858e);
+  border-radius: var(--select-radius, 10px);
+  background: var(--select-bg, #fff);
+  color: var(--select-color, #1d1c1d);
+  font: inherit;
+  font-size: var(--select-font-size, 16px);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+
+  &:hover:not([data-disabled]) {
+    border-color: var(--select-border-hover-color, #5f5862);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--select-focus-color, #8a5a91);
+    outline-offset: 2px;
+  }
+
+  &[data-popup-open] {
+    border-color: var(--select-focus-color, #8a5a91);
+  }
+
+  &[data-disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &[aria-invalid="true"] {
+    border-color: var(--select-error-color, #b32d3a);
+  }
+}
+
+.value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  &[data-placeholder] {
+    color: var(--select-placeholder-color, #616061);
+  }
+}
+
+.icon {
+  display: flex;
+  flex: none;
+  color: var(--select-icon-color, #616061);
+  transition: transform 0.15s ease;
+
+  [data-popup-open] > & {
+    transform: rotate(180deg);
+  }
+}
+
+.positioner {
+  z-index: var(--select-z-index, 1000);
+  outline: none;
+}
+
+.popup {
+  box-sizing: border-box;
+  min-width: var(--anchor-width);
+  max-height: var(--available-height);
+  overflow-y: auto;
+  padding: 4px;
+  border: 1px solid var(--select-border-color, #ddd7df);
+  border-radius: var(--select-radius, 10px);
+  background: var(--select-popup-bg, var(--select-bg, #fff));
+  color: var(--select-color, #1d1c1d);
+  box-shadow: var(--select-shadow, 0 8px 24px rgb(0 0 0 / 12%));
+  outline: none;
+  transform-origin: var(--transform-origin);
+  transition:
+    opacity 0.12s ease,
+    transform 0.12s ease;
+
+  &[data-starting-style],
+  &[data-ending-style] {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+
+.list {
+  outline: none;
+}
+
+.item {
+  display: grid;
+  grid-template-columns: 16px 1fr;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--select-item-height, 44px);
+  padding: var(--select-item-padding, 0 12px 0 8px);
+  border-radius: var(--select-item-radius, 6px);
+  font-size: var(--select-item-font-size, 15px);
+  cursor: default;
+  user-select: none;
+  outline: none;
+
+  &[data-highlighted] {
+    background: var(--select-item-highlight-bg, #efe8f0);
+  }
+
+  &[data-disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.itemIndicator {
+  display: flex;
+  grid-column: 1;
+}
+
+.itemText {
+  grid-column: 2;
+}
+
+.error {
+  margin: 0;
+  font-size: 12px;
+  color: var(--select-error-color, #b32d3a);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trigger,
+  .icon,
+  .popup {
+    transition: none;
+  }
+}
