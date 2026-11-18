@@ -10,11 +10,15 @@
   },
   "devDependencies": {
     "prettier": "3.9.6",
+    "prisma": "^7.10.1",
     "turbo": "^2.11.11",
     "typescript": "7.0.2"
   },
   "packageManager": "pnpm@11.25.0",
   "engines": {
     "node": ">=24"
+  },
+  "dependencies": {
+    "@prisma/client": "^7.10.1"
   }
 }
