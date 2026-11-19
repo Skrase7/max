@@ -1,0 +1,333 @@
+openapi: 3.0.3
+info:
+  title: Max API
+  version: 0.1.0
+  description: |
+    Черновик схемы API
+    Подробные правила лежат в apps/backend/docs/api-contracts.md
+    Сейчас тут только профиль и настройки юзера
+servers:
+  - url: http://localhost:5005/api/v1
+    description: local
+security:
+  - bearer: []
+tags:
+  - name: Профиль
+    description: Данные юзера которые видят другие
+  - name: Настройки
+    description: Настройки которые видит только сам юзер
+paths:
+  /users/me:
+    get:
+      tags: [Профиль]
+      summary: Мой профиль
+      operationId: getMyProfile
+      responses:
+        '200':
+          description: Профиль текущего юзера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfileResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    patch:
+      tags: [Профиль]
+      summary: Изменить профиль
+      description: |
+        Меняются только пришедшие поля
+        title можно очистить через null
+        displayName и timezone очистить нельзя
+      operationId: updateMyProfile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserProfile'
+            example:
+              displayName: Даня
+              title: null
+      responses:
+        '200':
+          description: Профиль целиком после изменения
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfileResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /users/me/settings:
+    get:
+      tags: [Настройки]
+      summary: Мои настройки
+      description: |
+        У нового юзера настройки уже есть со значениями по умолчанию
+        Если момент dndUntil прошел сервер отдает null
+      operationId: getMySettings
+      responses:
+        '200':
+          description: Настройки текущего юзера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSettingsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    patch:
+      tags: [Настройки]
+      summary: Изменить настройки
+      description: |
+        Меняются только пришедшие поля
+        dndUntil можно очистить через null
+        dndUntil должен быть в будущем
+        workDays присылается целиком
+        workHoursStart должен быть раньше workHoursEnd
+        Если хоть одно поле неправильное не сохраняется ничего
+      operationId: updateMySettings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserSettings'
+            example:
+              theme: dark
+              dndUntil: '2026-11-20T18:00:00Z'
+      responses:
+        '200':
+          description: Настройки целиком после изменения
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSettingsResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+components:
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer
+  schemas:
+    Theme:
+      type: string
+      enum: [light, dark, system]
+      default: system
+    Language:
+      type: string
+      enum: [ru, en]
+      default: ru
+    TimeFormat:
+      type: string
+      enum: ['12h', '24h']
+      default: '24h'
+    WorkTime:
+      type: string
+      pattern: '^([01]\d|2[0-3]):[0-5]\d$'
+      description: Время в формате HH:mm
+      example: '09:00'
+    UserProfile:
+      type: object
+      required: [id, email, displayName, title, avatarUrl, timezone]
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+          description: Меняется через авторизацию
+          example: user1@example.com
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 80
+          example: Даня
+        title:
+          type: string
+          nullable: true
+          minLength: 1
+          maxLength: 100
+          description: Должность
+          example: Backend developer
+        avatarUrl:
+          type: string
+          nullable: true
+          description: Загрузка появится вместе с файлами
+          example: null
+        timezone:
+          type: string
+          description: Часовой пояс из базы IANA
+          example: Europe/Moscow
+    UpdateUserProfile:
+      type: object
+      additionalProperties: false
+      properties:
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 80
+        title:
+          type: string
+          nullable: true
+          minLength: 1
+          maxLength: 100
+        timezone:
+          type: string
+          example: Europe/Moscow
+    UserSettings:
+      type: object
+      required:
+        - theme
+        - language
+        - timeFormat
+        - notifyTaskAssigned
+        - notifyTaskDueSoon
+        - notifyTaskBlocked
+        - dndUntil
+        - workHoursEnabled
+        - workDays
+        - workHoursStart
+        - workHoursEnd
+      properties:
+        theme:
+          $ref: '#/components/schemas/Theme'
+        language:
+          $ref: '#/components/schemas/Language'
+        timeFormat:
+          $ref: '#/components/schemas/TimeFormat'
+        notifyTaskAssigned:
+          type: boolean
+          description: Уведомлять когда мне назначили задачу
+          default: true
+        notifyTaskDueSoon:
+          type: boolean
+          description: Уведомлять когда срок моей задачи близко
+          default: true
+        notifyTaskBlocked:
+          type: boolean
+          description: Уведомлять когда мою задачу заблокировали
+          default: true
+        dndUntil:
+          type: string
+          format: date-time
+          nullable: true
+          description: Не беспокоить до этого момента в UTC
+          example: null
+        workHoursEnabled:
+          type: boolean
+          description: Уведомления только в рабочие дни и часы
+          default: false
+        workDays:
+          type: array
+          description: 1 это понедельник и 7 это воскресенье
+          minItems: 1
+          maxItems: 7
+          uniqueItems: true
+          items:
+            type: integer
+            minimum: 1
+            maximum: 7
+          example: [1, 2, 3, 4, 5]
+        workHoursStart:
+          $ref: '#/components/schemas/WorkTime'
+        workHoursEnd:
+          allOf:
+            - $ref: '#/components/schemas/WorkTime'
+          example: '18:00'
+    UpdateUserSettings:
+      type: object
+      additionalProperties: false
+      properties:
+        theme:
+          $ref: '#/components/schemas/Theme'
+        language:
+          $ref: '#/components/schemas/Language'
+        timeFormat:
+          $ref: '#/components/schemas/TimeFormat'
+        notifyTaskAssigned:
+          type: boolean
+        notifyTaskDueSoon:
+          type: boolean
+        notifyTaskBlocked:
+          type: boolean
+        dndUntil:
+          type: string
+          format: date-time
+          nullable: true
+        workHoursEnabled:
+          type: boolean
+        workDays:
+          type: array
+          minItems: 1
+          maxItems: 7
+          uniqueItems: true
+          items:
+            type: integer
+            minimum: 1
+            maximum: 7
+        workHoursStart:
+          $ref: '#/components/schemas/WorkTime'
+        workHoursEnd:
+          $ref: '#/components/schemas/WorkTime'
+    UserProfileResponse:
+      type: object
+      required: [result]
+      properties:
+        result:
+          $ref: '#/components/schemas/UserProfile'
+    UserSettingsResponse:
+      type: object
+      required: [result]
+      properties:
+        result:
+          $ref: '#/components/schemas/UserSettings'
+    Error:
+      type: object
+      required: [code, message, details]
+      properties:
+        code:
+          type: string
+          enum:
+            - BAD_REQUEST
+            - VALIDATION_ERROR
+            - UNAUTHORIZED
+            - FORBIDDEN
+            - NOT_FOUND
+            - CONFLICT
+            - TOO_MANY_REQUESTS
+            - INTERNAL_ERROR
+        message:
+          type: string
+        details:
+          type: object
+          nullable: true
+          description: Что внутри зависит от code
+  responses:
+    Unauthorized:
+      description: Нет токена или он протух
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: UNAUTHORIZED
+            message: token is missing or invalid
+            details: null
+    ValidationError:
+      description: Поля не прошли проверку
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: VALIDATION_ERROR
+            message: validation failed
+            details:
+              fields:
+                - field: displayName
+                  message: too long
