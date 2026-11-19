@@ -1,0 +1,175 @@
+// Все значения переопределяются CSS-переменными --tabs-*, SCSS править не нужно.
+// Переменные можно задавать на любом родителе или через className / listClassName /
+// tabClassName / panelClassName.
+//
+// Вид задаётся атрибутами на корне: data-variant (underline | segmented),
+// data-size (sm | md | lg), data-full-width.
+//
+// Дизайн-токены пока не подключены, поэтому запасные значения заданы здесь.
+
+.root {
+  // Размеры по умолчанию (--tabs-* поверх них всё равно побеждают).
+  --_height: 44px;
+  --_padding: 0 16px;
+  --_font-size: 15px;
+
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+
+  &[data-size="sm"] {
+    --_height: 36px;
+    --_padding: 0 12px;
+    --_font-size: 14px;
+  }
+
+  &[data-size="lg"] {
+    --_height: 52px;
+    --_padding: 0 20px;
+    --_font-size: 16px;
+  }
+}
+
+.list {
+  position: relative;
+  z-index: 0;
+  display: flex;
+  gap: var(--tabs-gap, 4px);
+  // Если вкладки не помещаются, список прокручивается; полосу прокрутки прячем.
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  [data-full-width] > & {
+    width: 100%;
+  }
+
+  // underline: линия вдоль списка.
+  [data-variant="underline"] > & {
+    box-shadow: inset 0 -1px 0 var(--tabs-border-color, #ddd7df);
+  }
+
+  // segmented: общая рамка-подложка.
+  [data-variant="segmented"] > & {
+    gap: 0;
+    padding: var(--tabs-segmented-padding, 4px);
+    border-radius: var(--tabs-segmented-radius, 10px);
+    background: var(--tabs-segmented-bg, #f1edf2);
+  }
+}
+
+.tab {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-sizing: border-box;
+  min-height: var(--tabs-tab-height, var(--_height));
+  min-width: 44px;
+  padding: var(--tabs-tab-padding, var(--_padding));
+  border: 0;
+  border-radius: var(--tabs-radius, 6px);
+  background: transparent;
+  color: var(--tabs-color, #616061);
+  font: inherit;
+  font-size: var(--tabs-font-size, var(--_font-size));
+  font-weight: var(--tabs-font-weight, 600);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.15s ease;
+
+  // На полной ширине вкладки делят свободное место, но не сжимаются меньше текста.
+  [data-full-width] > .list > & {
+    flex: 1 0 auto;
+  }
+
+  &:hover:not([data-disabled]) {
+    color: var(--tabs-hover-color, #1d1c1d);
+  }
+
+  &[data-active] {
+    color: var(--tabs-active-color, #1d1c1d);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--tabs-focus-color, #8a5a91);
+    outline-offset: -3px;
+  }
+
+  &[data-disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.icon {
+  display: flex;
+  flex: none;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  box-sizing: border-box;
+  border-radius: 10px;
+  background: var(--tabs-badge-bg, #efe8f0);
+  color: var(--tabs-badge-color, #1d1c1d);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+// Подвижный индикатор под активной вкладкой. Позиция и размер приходят из
+// Base UI через --active-tab-*.
+.indicator {
+  position: absolute;
+  z-index: -1;
+  left: var(--active-tab-left);
+  width: var(--active-tab-width);
+  transition:
+    left 0.2s ease,
+    width 0.2s ease;
+
+  // underline: полоса внизу.
+  [data-variant="underline"] & {
+    bottom: 0;
+    height: var(--tabs-indicator-size, 2px);
+    background: var(--tabs-indicator-color, #8a5a91);
+  }
+
+  // segmented: заливка точно под активной вкладкой.
+  [data-variant="segmented"] & {
+    top: var(--active-tab-top);
+    height: var(--active-tab-height);
+    border-radius: var(--tabs-radius, 6px);
+    background: var(--tabs-segmented-active-bg, #fff);
+    box-shadow: var(--tabs-segmented-shadow, 0 1px 3px rgb(0 0 0 / 15%));
+  }
+}
+
+.panel {
+  padding: var(--tabs-panel-padding, 16px 0);
+  color: var(--tabs-panel-color, #1d1c1d);
+  font-size: var(--tabs-panel-font-size, 15px);
+
+  &:focus-visible {
+    outline: 3px solid var(--tabs-focus-color, #8a5a91);
+    outline-offset: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tab,
+  .indicator {
+    transition: none;
+  }
+}

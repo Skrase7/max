@@ -1,2 +1,1 @@
-export { Button, Select } from "./src";
-export type { SelectProps, SelectOption } from "./src";
+export * from "./src/components";
