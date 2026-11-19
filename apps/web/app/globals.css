@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import "./tokens.css";
+@import "@repo/ui/styles/tokens.css";
 
 button {
   border: none;
