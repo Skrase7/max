@@ -20,7 +20,7 @@ export const Button = ({ variant = 'primary', size = 'm', isLoading = false, lef
           {leftIcon}
         </span>
       )}
-      {children}
+      <span className={styles.text}>{children}</span>
       {rightIcon && (
         <span aria-hidden='true' className={styles.icon}>
           {rightIcon}
