@@ -1,0 +1,18 @@
+{
+  "scripts": {
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "prisma db seed",
+    "db:rollback": "prisma migrate reset --force"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.10.1",
+    "dotenv": "^18.0.10"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.15"
+  }
+}
