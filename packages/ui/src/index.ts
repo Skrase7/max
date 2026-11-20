@@ -1,1 +1,2 @@
-export { Button } from "./components";
+export { Button, Select } from "./components";
+export type { SelectProps, SelectOption } from "./components";
