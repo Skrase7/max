@@ -5,4 +5,5 @@ export type TextVariant =
 
 export interface TextProps extends HTMLAttributes<HTMLElement> {
   variant?: TextVariant;
+  as?: keyof HTMLElementTagNameMap;
 }
