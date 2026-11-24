@@ -1,8 +1,5 @@
 @import "tailwindcss";
-
-:root {
-  --test-color: #0f0;
-}
+@import "@repo/ui/styles/tokens.css";
 
 button {
   border: none;
