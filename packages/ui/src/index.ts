@@ -1,3 +1,2 @@
-export { Button } from "./components";
-export { Text } from "./components";
-export type { TextProps, TextVariant } from "./components";
+export { Button, Select,Text  } from "./components";
+export type { SelectProps, SelectOption,TextProps, TextVariant   } from "./components";

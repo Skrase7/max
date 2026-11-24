@@ -1,3 +1,2 @@
-export { Button } from "./src";
-export { Text } from "./src";
-export type { TextProps, TextVariant } from "./src";
+export { Button, Select, Text } from "./src";
+export type { SelectProps, SelectOption, TextProps, TextVariant } from "./src";
