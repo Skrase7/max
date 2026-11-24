@@ -3,7 +3,6 @@ import clsx from "clsx";
 import styles from "./button.module.scss";
 
 export function Button() {
-  console.log(styles);
   return (
     <>
       <button className={styles.button}>asfasf</button>
