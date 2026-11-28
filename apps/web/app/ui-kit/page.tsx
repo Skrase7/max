@@ -1,6 +1,7 @@
 "use client";
 // Страница для просмотра компонентов UI kit.
-import { Select } from "@repo/ui";
+import { Accordion, Select } from "@repo/ui";
+import { accordionOptions, triangleIcon } from "./accordion-mocks";
 
 const StarIcon = () => (
   <svg
@@ -28,7 +29,15 @@ const options = [
 
 export default function UiKitPage() {
   return (
-    <main style={{ maxWidth: 360, padding: 24 }}>
+    <main style={{ maxWidth: 360, padding: 24, display: "grid", gap: 32 }}>
+      <Accordion options={accordionOptions} defaultValue={["description"]} />
+      <Accordion
+        options={accordionOptions}
+        size="sm"
+        chevronIcon={triangleIcon}
+        multiple
+      />
+      <Accordion options={accordionOptions} size="lg" />
       <Select
         label="Статус"
         options={options}
