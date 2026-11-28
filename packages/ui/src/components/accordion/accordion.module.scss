@@ -1,0 +1,148 @@
+// Все значения переопределяются CSS-переменными --accordion-*, SCSS править не
+// нужно. Значения по умолчанию берутся из дизайн-токенов (styles/tokens.css).
+//
+// Имена --accordion-panel-height и --accordion-panel-width заняты Base UI,
+// поэтому переменные содержимого называются --accordion-content-*.
+
+.root {
+  // Радиус внутри рамки: общий минус её толщина.
+  --_inner-radius: calc(var(--accordion-radius, var(--radius-md)) - 1px);
+  // Размер md. Переменные --accordion-* имеют приоритет над размером.
+  --_trigger-height: 44px;
+  --_trigger-padding: var(--space-3) var(--space-4);
+  --_font-size: var(--text-base);
+  --_content-padding: var(--space-1) var(--space-4) var(--space-4);
+  --_content-font-size: var(--text-base);
+
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--accordion-border-color, var(--color-border));
+  border-radius: var(--accordion-radius, var(--radius-md));
+  background: var(--accordion-bg, var(--color-surface));
+  color: var(--accordion-color, var(--color-foreground));
+  font-family: var(--accordion-font-family, var(--font-sans));
+
+  &[data-size="sm"] {
+    --_trigger-height: 36px;
+    --_trigger-padding: var(--space-2) var(--space-3);
+    --_font-size: var(--text-sm);
+    --_content-padding: var(--space-1) var(--space-3) var(--space-3);
+    --_content-font-size: var(--text-sm);
+  }
+
+  &[data-size="lg"] {
+    --_trigger-height: 52px;
+    --_trigger-padding: var(--space-3) var(--space-5);
+    --_font-size: var(--text-lg);
+    --_content-padding: var(--space-1) var(--space-5) var(--space-5);
+  }
+}
+
+.item {
+  & + & {
+    border-top: 1px solid var(--accordion-border-color, var(--color-border));
+  }
+
+  // Скругляем крайние заголовки, чтобы фон и фокус не вылезали за рамку.
+  // Только прямые потомки: вложенный аккордеон эти правила задевать не должны.
+  &:first-child > .header > .trigger {
+    border-top-left-radius: var(--_inner-radius);
+    border-top-right-radius: var(--_inner-radius);
+  }
+
+  &:last-child > .header > .trigger:not([data-panel-open]) {
+    border-bottom-right-radius: var(--_inner-radius);
+    border-bottom-left-radius: var(--_inner-radius);
+  }
+}
+
+.header {
+  margin: 0;
+}
+
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--accordion-trigger-height, var(--_trigger-height));
+  padding: var(--accordion-trigger-padding, var(--_trigger-padding));
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: var(--accordion-font-size, var(--_font-size));
+  font-weight: var(--accordion-font-weight, 600);
+  line-height: var(--leading-tight);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+
+  &:hover:not([data-disabled]) {
+    background: var(--accordion-hover-bg, var(--color-surface-muted));
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--accordion-focus-color, var(--color-ring));
+    outline-offset: -3px;
+  }
+
+  &[data-disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.icon,
+.chevron {
+  display: flex;
+  flex: none;
+  color: var(--accordion-icon-color, var(--color-muted-foreground));
+}
+
+.title {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.chevron {
+  transition: transform 0.2s ease;
+
+  [data-panel-open] > & {
+    transform: rotate(180deg);
+  }
+}
+
+.panel {
+  // Высоту панели передаёт Base UI, по ней идёт анимация раскрытия.
+  height: var(--accordion-panel-height);
+  overflow: hidden;
+  transition: height 0.2s ease;
+
+  &[data-starting-style],
+  &[data-ending-style] {
+    height: 0;
+  }
+}
+
+// Отступы здесь, а не на .panel: иначе закрытая панель не схлопнется в ноль.
+.content {
+  padding: var(--accordion-content-padding, var(--_content-padding));
+  color: var(--accordion-content-color, var(--color-foreground));
+  font-size: var(--accordion-content-font-size, var(--_content-font-size));
+  line-height: var(--leading-normal);
+  overflow-wrap: anywhere;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trigger,
+  .chevron,
+  .panel {
+    transition: none;
+  }
+}
